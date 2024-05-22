@@ -11,22 +11,16 @@ export class DemoInfraStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
+    //DynamoDB Table with partition key = id
     const dynamodb_table = new dynamodb.Table(this, "Table", {
       partitionKey: { name: "id", type: dynamodb.AttributeType.STRING },
       removalPolicy: RemovalPolicy.DESTROY
     });
 
-   /*  const lambda_backend = new lambda.Function(this, "lambdaFunction", {
-      runtime: lambda.Runtime.NODEJS_16_X,
-      handler: "index.handler",
-      code: lambda.Code.fromAsset("../services/lambda"),
-      environment: {
-        DYNAMODB: dynamodb_table.tableName
-      },
-    }) */
-
+    //define lambda source location in services folder
     const lambdaAppDir = path.resolve(__dirname, '../../services/lambda')
 
+    //create lambda function with nodejs runtime using services folder as project root.
     const lambda_backend = new aws_lambda_nodejs.NodejsFunction(this, 'lambdaFunction',
       {
         functionName: 'lambdaFunction',
@@ -39,14 +33,17 @@ export class DemoInfraStack extends cdk.Stack {
         }
       });
 
+    //grant write permission in dynamodDB to lambda
     dynamodb_table.grantWriteData(lambda_backend.role!)
 
+    //create rest api endpoint 
     const api = new apigateway.RestApi(this, "RestAPI");
 
-
+    //define endpoint and method POST integrate with lamdba 
     const endpoint = api.root.addResource("scan")
     const endpointMethod = endpoint.addMethod("POST", new apigateway.LambdaIntegration(lambda_backend))
 
+    //output api endpoint url.
     new cdk.CfnOutput(this, "Endpoint", { value: api.url })
 
   }

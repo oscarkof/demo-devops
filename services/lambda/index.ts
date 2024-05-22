@@ -1,13 +1,13 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, PutCommand} from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { APIGatewayProxyEvent } from "aws-lambda";
 
 
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
-const tableName =process.env.DYNAMODB || "undefined";
+const tableName = process.env.DYNAMODB || "undefined";
 
-exports.handler = async (event:APIGatewayProxyEvent) => {
+exports.handler = async (event: APIGatewayProxyEvent) => {
   let body;
   let statusCode = 200;
   const headers = {
