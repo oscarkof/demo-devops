@@ -1,11 +1,13 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand} from "@aws-sdk/lib-dynamodb";
+import { APIGatewayProxyEvent } from "aws-lambda";
+
 
 const client = new DynamoDBClient({});
 const dynamo = DynamoDBDocumentClient.from(client);
 const tableName =process.env.DYNAMODB || "undefined";
 
-export const handler = async (event, context) => {
+exports.handler = async (event:APIGatewayProxyEvent) => {
   let body;
   let statusCode = 200;
   const headers = {
@@ -13,7 +15,7 @@ export const handler = async (event, context) => {
   };
 
   try {
-    let requestJSON = JSON.parse(event.body);
+    let requestJSON = JSON.parse(event.body || '{}');
     await dynamo.send(
       new PutCommand({
         TableName: tableName,

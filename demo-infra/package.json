@@ -5,6 +5,7 @@
     "demo-infra": "bin/demo-infra.js"
   },
   "scripts": {
+    "prebuild": "npm install && cd ../services/lambda && npm i",
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
